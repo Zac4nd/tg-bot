@@ -1,0 +1,5 @@
+.env
+notified_torrents.json
+__pycache__/
+*.pyc
+venv/

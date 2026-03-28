@@ -1,0 +1,4 @@
+python-telegram-bot[job-queue]
+transmission-rpc
+routeros-api
+python-dotenv
