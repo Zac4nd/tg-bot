@@ -1,12 +1,22 @@
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 
+# Forza il caricamento del file .env dalla cartella corrente
 load_dotenv()
 
+# --- TELEGRAM ---
 TOKEN = os.getenv("TELEGRAM_TOKEN")
-WHITELIST = [int(i) for i in os.getenv("WHITELIST", "").split(",")]
-MK_HOST = os.getenv("MK_HOST", "172.16.0.1")
-MK_USER = os.getenv("MK_USER", "tg-bot")
+# Puliamo la whitelist: rimuove spazi e converte in numeri interi
+raw_whitelist = os.getenv("TELEGRAM_WHITELIST", "")
+WHITELIST = [int(x.strip()) for x in raw_whitelist.split(",") if x.strip()]
+
+# --- MIKROTIK ---
+MK_HOST = os.getenv("MK_HOST", "192.168.88.1")
+MK_USER = os.getenv("MK_USER")
 MK_PASS = os.getenv("MK_PASS")
-TR_HOST = os.getenv("TR_HOST", "transmission")
-DB_FILE = "/app/notified_torrents.json"
+MK_PORT = int(os.getenv("MK_PORT", 8729))
+MK_SSL = os.getenv("MK_USE_SSL", "True").lower() == "true"
+
+# --- TRANSMISSION ---
+TR_HOST = os.getenv("TR_HOST")
+TR_PORT = int(os.getenv("TR_PORT", 9091))
