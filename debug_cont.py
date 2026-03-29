@@ -10,8 +10,8 @@ def check_raw_containers():
             username=config.MK_USER,
             password=config.MK_PASS,
             port=config.MK_PORT,
-            use_ssl=config.MK_SSL,
-            ssl_verify=False,
+            use_ssl=config.MK_USE_SSL,
+            ssl_verify=config.MK_SSL_VERIFY,
             plaintext_login=True
         )
         api = connection.get_api()

@@ -8,9 +8,9 @@ def get_api_pool():
         config.MK_HOST, 
         username=config.MK_USER, 
         password=config.MK_PASS, 
-        port=8729,            # Forza la porta SSL
-        use_ssl=True,         # Attiva la crittografia
-        ssl_verify=False,     # Ignora il certificato auto-firmato (come nel test)
+        port=config.MK_PORT,
+        use_ssl=config.MK_USE_SSL,
+        ssl_verify=config.MK_SSL_VERIFY,
         plaintext_login=True  # Fondamentale per RouterOS v7
     )
 

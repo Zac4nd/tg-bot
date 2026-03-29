@@ -1,20 +1,16 @@
 import routeros_api
+import config
 
-# Parametri definiti
-host = "192.168.88.1"
-user = "tg-bot"
-password = "5gTuau8hZXksT0gQx4Fa"
-
-print(f"--- TENTATIVO CONNESSIONE SSL (Porta 8729) ---")
+print(f"--- TENTATIVO CONNESSIONE SSL (Porta {config.MK_PORT}) ---")
 
 try:
     connection = routeros_api.RouterOsApiPool(
-        host,
-        username=user,
-        password=password,
-        port=8729,
-        use_ssl=True,
-        ssl_verify=False,    # Obbligatorio: il tuo PC non conosce la "myCA" del router
+        config.MK_HOST,
+        username=config.MK_USER,
+        password=config.MK_PASS,
+        port=config.MK_PORT,
+        use_ssl=config.MK_USE_SSL,
+        ssl_verify=config.MK_SSL_VERIFY,
         plaintext_login=True # Obbligatorio per RouterOS v7 / RB5009
     )
     api = connection.get_api()
