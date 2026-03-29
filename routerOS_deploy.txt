@@ -1,0 +1,57 @@
+{
+# --- 1. CONFIGURAZIONE PARAMETRI ---
+:local contName "PythonContainerName"
+
+# Generazione automatica basata su $contName
+:local vethName ("veth_" . $contName)
+:local mountListName ($contName . "_mounts")
+:local envListName ($contName . "_envs")
+:local usbPath ("usb-esterna/docker-data/python-projects/" . $contName)
+:local rootDir ("usb-esterna/containers/" . $contName)
+
+# Parametri di rete (fissi o da cambiare manualmente)
+:local vethIP "172.26.0.2/24"
+:local vethGW "172.26.0.1"
+:local bridgeName "docker_bridge"
+
+:put "--- s🚀 Inizio Procedura di Deploy per $contName ---"
+
+# --- 2. PULIZIA PREVENTIVA ---
+# Rimuove versioni precedenti per evitare conflitti 'already exists'
+#/container remove [find name=$contName]
+#/container mounts remove [find list=$mountListName]
+#/container envs remove [find list=$envListName]
+#/interface bridge port remove [find interface=$vethName]
+#/interface veth remove [find name=$vethName]
+
+# --- 3. CONFIGURAZIONE RETE ---
+/interface veth add name=$vethName address=$vethIP gateway=$vethGW
+/interface bridge port add bridge=$bridgeName interface=$vethName
+:if ([:len [/ip address find address=($vethGW . "/24")]] = 0) do={ 
+    /ip address add address=($vethGW . "/24") interface=$bridgeName 
+}
+
+# --- 4. CONFIGURAZIONE MOUNT ---
+# Usiamo 'list' come identificatore obbligatorio
+/container mounts add list=$mountListName src=$usbPath dst="/app"
+
+# --- 5. CONFIGURAZIONE VARIABILI AMBIENTE (ENV) ---
+/container envs add list=$envListName key="PYTHONUNBUFFERED" value="1"
+/container envs add list=$envListName key="TZ" value="Europe/Rome"
+
+# --- 6. CREAZIONE CONTAINER ---
+# Parametri verificati: name, mountlists, envlists
+/container add \
+    name=$contName \
+    remote-image="python:3.11-alpine" \
+    interface=$vethName \
+    root-dir=$rootDir \
+    mountlists=$mountListName \
+    envlists=$envListName \
+    cmd="sh -c 'pip install --no-cache-dir -r /app/requirements.txt && python /app/main.py'" \
+    workdir="/app" \
+    comment=$contName \
+    logging=yes
+
+:put "--- ✅ Deploy Completato! Il container è pronto nella tab Container. ---"
+}
