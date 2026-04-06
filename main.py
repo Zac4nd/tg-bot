@@ -11,6 +11,11 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 # Stato notifiche (in memoria, si resetta al riavvio del bot)
 ALREADY_NOTIFIED = set()
 
+# --- UTILS ---
+def escape_md(text: str) -> str:
+    """Escapa i caratteri speciali del Markdown per evitare errori di parsing."""
+    return text.replace("_", "\\_").replace("*", "\\*").replace("`", "\\`").replace("[", "\\[")
+
 # --- MIDDLEWARE DI SICUREZZA ---
 def is_authorized(update: Update) -> bool:
     return update.effective_chat.id in config.WHITELIST
@@ -111,7 +116,7 @@ async def list_torrents(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
     report = "📊 **Download in corso:**\n"
     for t in torrents:
-        clean_name = t.name[:25] + "..." if len(t.name) > 25 else t.name
+        clean_name = escape_md(t.name[:25] + "..." if len(t.name) > 25 else t.name)
         # Mostra lo stato: scaricamento o seeding (finito)
         status = "✅ Finito" if t.progress >= 100 else "⏳ DL"
         report += f"- ID: `{t.id}` | {status} | {clean_name} | {round(t.progress, 1)}%\n"
@@ -158,7 +163,7 @@ async def check_downloads(context: ContextTypes.DEFAULT_TYPE):
                 try:
                     await context.bot.send_message(
                         chat_id=user_id, 
-                        text=f"✅ **Download Completato!**\n📦 {t.name}",
+                        text=f"✅ **Download Completato!**\n📦 {escape_md(t.name)}",
                         parse_mode='Markdown'
                     )
                 except Exception as e:

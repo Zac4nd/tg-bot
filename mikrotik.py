@@ -2,6 +2,9 @@ import routeros_api
 import logging
 import config
 
+def escape_md(text: str) -> str:
+    return text.replace("_", "\\_").replace("*", "\\*").replace("`", "\\`").replace("[", "\\[")
+
 def get_api_pool():
     # Qui aggiungiamo i parametri fondamentali per la connessione sicura al RB5009
     return routeros_api.RouterOsApiPool(
@@ -45,13 +48,13 @@ def get_system_report():
         c_status = []
         for c in conts:
             # Nome: Usiamo 'comment' (es. PiHole, ClientTorrent)
-            name = c.get('comment') or c.get('name') or f"ID-{c.get('.id')}"
+            raw_name = c.get('comment') or c.get('name') or f"ID-{c.get('.id')}"
             
             # Stato: Se 'running' esiste ed è 'true' (stringa) o True (booleano)
             is_running = str(c.get('running', '')).lower() == 'true'
             
             icon = "🟢" if is_running else "🔴"
-            c_status.append(f"{icon} {name}")
+            c_status.append(f"{icon} {escape_md(raw_name)}")
             
         if not c_status:
             c_status = ["ℹ️ Nessun container configurato"]
